@@ -1,31 +1,21 @@
-
-import './App.css';
-import { useState, useEffect } from 'react'
-import axios from 'axios';
-
+import React from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import ProductListing from "./containers/ProductListing";
+import Header from "./containers/Header";
+import "./App.css";
+import ProductDetails from "./containers/ProductDetails";
 
 function App() {
-
-  
-  const [fashionList, setFashionList] = useState([]);
-
-  const url = 'http://localhost:9000/';
-
-  useEffect(() => {
-    axios.get(url).then((response) => {
-      setFashionList(response.data);
-    });
-  }, [setFashionList]);
-
-
   return (
-    <div className='App'>
-      {fashionList.map((fash)=> {
-        return <div key={fash.id} style={{width: 200}}>
-          <img src={fash.image}/>
-          <h4>{fash.productName}</h4>
-        </div>
-      })}
+    <div className="App">
+      <Router>
+        <Header />
+        <Switch>
+          <Route path="/" exact component={ProductListing} />
+          <Route path="/product/:productId" component={ProductDetails} />
+          <Route>404 Not Found!</Route>
+        </Switch>
+      </Router>
     </div>
   );
 }
