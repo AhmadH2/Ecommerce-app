@@ -21,3 +21,7 @@ db.documents.query(qb.where(qb.byExample({ baseColour: 'Black' }))).result(
     console.log(JSON.stringify(error, null, 2));
   }
 );
+
+// db.documents
+//     .query(qb.where(qb.and(qb.collection("category"), qb.byExample({masterCatName: req.params.master}))))
+//     .result(

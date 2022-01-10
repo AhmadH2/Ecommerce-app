@@ -12,11 +12,13 @@ const dir = './data';
 //   .filter((name) => path.extname(name) === '.json')
 //   .map((name) => fs.readFileSync(path.join(dir, name)));
 
-let rawdata = fs.readFileSync('./data/3450.json');
+let rawdata = fs.readFileSync('./data/11423.json');
 let fashion = JSON.parse(rawdata);
 console.log(fashion);
 
-const documents = [{ uri: '3450.json', content: fashion }];
+const documents = [
+  { uri: '11423.json', content: fashion, collections: ['fashion'] },
+];
 
 // Document descriptors to pass to write().
 // const documents = [
