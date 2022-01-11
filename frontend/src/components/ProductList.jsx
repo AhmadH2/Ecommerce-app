@@ -1,43 +1,78 @@
 import React, { useEffect, useCallback, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setProducts } from "../redux/actions/productsActions";
+import { setPage, setProducts, setLastQuery, setCategories } from "../redux/actions/productActions";
 import ProductComponent from "./ProductComponent";
-// import Pagination from '@mui/material/Pagination';
-// import Pagination from 'react-js-pagination';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
-const url = 'http://localhost:9000/fashion';
+// const url = 'http://localhost:9000';
 
 const ProductList = () => {
-    const [currentPage, setCurrentPage] = useState(1);
+    // const [currentPage, setCurrentPage] = useState(1);
+  const url = useSelector(state => state.productsReducer.url)
   const products = useSelector((state) => state.productsReducer.products);
   const dispatch = useDispatch();
-
-  const fetchProducts = async () => {
-    const response = await axios
-      .get(url)
-      .catch((err) => {
-        console.log("Err: ", err);
-      });
+  const page = useSelector((state)=> state.productsReducer.page)
+  const activeCat = useSelector((state) => state.productsReducer.activeCat);
+  const getProducts = async () => {
+    dispatch(setProducts([]));
+    const response = await axios.get(`${url}/fashion/?page=${page}`).catch((err) => {
+      console.log('Err: ', err);
+    });
     dispatch(setProducts(response.data));
   };
 
   useEffect(() => {
-    fetchProducts();
+    getProducts();
   }, []);
 
-  console.log("Products :", products);
+  const handlePage = async (event, value) => {
+    dispatch(setPage(value))
 
-  const setCurrentPageNo = (e) => {
-    setCurrentPage(e);
-  };
+    if (activeCat.sub !== '') {
+      const response = await axios
+        .get(`${url}/fashion/subcat/${activeCat.sub}/products?page=${page}`)
+        .catch((err) => {
+          console.log('Err: ', err);
+        });
+      dispatch(setProducts(response.data))
+    }
+    else if (activeCat.master !== '') {
+      const reposnse = await axios
+        .get(
+          `${url}/fashion/category/${activeCat.master}/products?page=${page}`
+        )
+        .catch((err) => {
+          console.log('Err: ', err);
+        });
+      dispatch(setProducts(reposnse.data))
+    }
+    else {
+      getProducts()
+    }
+  }
+
   return (
     <div>
       <div className='ui grid container'>
         <ProductComponent />
       </div>
-      <div className='ui grid container paginationBox'>
-        {/* <Pagination /> */}
+      <div
+        className='ui grid container'
+        style={{ display: 'flex', justifyContent: 'center' }}
+      >
+        <Stack spacing={2}>
+          <Pagination
+            count={10}
+            shape='rounded'
+            size='large'
+            showFirstButton
+            showLastButton
+            page={page}
+            onChange={handlePage}
+          />
+        </Stack>
       </div>
     </div>
   );

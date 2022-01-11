@@ -7,6 +7,12 @@ export const setProducts = (products) => {
   };
 };
 
+export const getProducts = () => {
+  return {
+    type: ActionTypes.GET_PRODUCTS,
+  }
+}
+
 export const setCategories = (categories) => {
   return {
     type: ActionTypes.SET_CATEGORIES,
@@ -21,6 +27,19 @@ export const setSubCat = (categories) => {
   };
 };
 
+export const setPage = (page) => {
+  return {
+    type: ActionTypes.SET_PAGE,
+    payload: page
+  }
+};
+
+export const setActiveCat = (query) => {
+  return {
+    type: ActionTypes.SET_ACTIVE_CAT,
+    payload: query,
+  };
+};
 
 export const selectedProduct = (product) => {
   return {

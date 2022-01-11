@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectedProduct,
   removeSelectedProduct,
-} from "../redux/actions/productsActions";
+} from "../redux/actions/productActions";
 import styled from 'styled-components';
 import { Add, Remove } from '@material-ui/icons';
 import Slider from "./Slider";
