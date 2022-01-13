@@ -62,7 +62,7 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const { productId } = useParams();
   let product = useSelector((state) => state.product);
-  const { images, title, price, masterCategory, subCategory, brandName, description, sizes } = product;
+  const { images, title, price, masterCategory, subCategory, brandName, description, sizes, crossLinks } = product;
   const dispatch = useDispatch();
   const fetchProductDetail = async (id) => {
     const response = await axios
@@ -134,6 +134,16 @@ const ProductDetails = () => {
                 </div>
                 <h3>Description: </h3>
                 <div dangerouslySetInnerHTML={{ __html: description }}></div>
+                <br />
+                <h4>Cheak this links for simialer products:</h4>
+                <ul>
+                  {crossLinks.map((link) => (
+                    <li>
+                      <a href={'http://localhost:9000/search/'+link.value}>{link.key}</a>
+                      <br />
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>

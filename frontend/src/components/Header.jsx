@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 
-import { Badge } from "@material-ui/core";
+import { Badge, Button } from "@material-ui/core";
 import { Search, ShoppingCartOutlined } from "@material-ui/icons";
 // import React from "react";
 import styled from "styled-components";
 import { mobile } from "../responsive";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { setProducts } from "../redux/actions/productActions";
 
 const Container = styled.div`
   height: 60px;
@@ -42,7 +44,8 @@ const SearchContainer = styled.div`
 `;
 
 const Input = styled.input`
-  border: none;
+  border: 1px solid grey;
+  height: 25px;
   ${mobile({ width: "50px" })}
 `;
 
@@ -72,6 +75,18 @@ const MenuItem = styled.div`
 
 const Header = () => {
   // const quantity = useSelector(state=>state.cart.quantity)
+  const dispach = useDispatch();
+  const url = useSelector((state) => state.productsReducer.url);
+  const [searchValue, setSearchValue] = useState('');
+
+  const inputHandle = (event) => {
+    setSearchValue(event.target.value);
+  }
+  const search = () => {
+    console.log(searchValue)
+    axios.get(`${url}/search?q=${searchValue}`).then((response) => dispach(setProducts(response.data)))
+  }
+
   const quantity = 0;
   return (
     <Container>
@@ -80,13 +95,14 @@ const Header = () => {
           <Logo>Horyzat shop</Logo>
           {/* <Language>EN</Language> */}
           <SearchContainer>
-            <Input placeholder='Search' />
+            <Input placeholder='Search' onChange={inputHandle} />
             <Search style={{ color: 'gray', fontSize: 16 }} />
+            <Button color='primary' onClick={search} type="submit">
+              Search
+            </Button>
           </SearchContainer>
         </Left>
-        <Center>
-          {/* <Logo>LAMA.</Logo> */}
-        </Center>
+        <Center>{/* <Logo>LAMA.</Logo> */}</Center>
         <Right>
           <MenuItem>REGISTER</MenuItem>
           <MenuItem>SIGN IN</MenuItem>

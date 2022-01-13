@@ -7,6 +7,7 @@ const intialState = {
   products: [],
   categories: [],
   subCat: [],
+  articleTypes: [],
 };
 
 export const productsReducer = (state = intialState, { type, payload }) => {
@@ -17,6 +18,8 @@ export const productsReducer = (state = intialState, { type, payload }) => {
       return {...state, page: payload}
     case ActionTypes.SET_ACTIVE_CAT:
       return {...state, activeCat: payload}
+    case ActionTypes.SET_ARTICLTYPE:
+      return {...state, articleTypes:payload};
     default:
       return state;
   }
@@ -32,6 +35,8 @@ export const categoriesReducer = (state = intialState, { type, payload }) => {
       return { ...state, page: payload };
     case ActionTypes.SET_ACTIVE_CAT:
       return { ...state, activeCat: payload };
+    case ActionTypes.SET_ARTICLTYPE:
+      return { ...state, articleTypes: payload };
     default:
       return state;
   }

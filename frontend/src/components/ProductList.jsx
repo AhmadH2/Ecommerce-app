@@ -32,7 +32,9 @@ const ProductList = () => {
 
     if (activeCat.sub !== '') {
       const response = await axios
-        .get(`${url}/fashion/subcat/${activeCat.sub}/products?page=${page}`)
+        .get(
+          `${url}/fashion/subcat/products?name=${activeCat.sub}&page=${value}`
+        )
         .catch((err) => {
           console.log('Err: ', err);
         });
@@ -41,7 +43,7 @@ const ProductList = () => {
     else if (activeCat.master !== '') {
       const reposnse = await axios
         .get(
-          `${url}/fashion/category/${activeCat.master}/products?page=${page}`
+          `${url}/fashion/category/products?name=${activeCat.master}&page=${value}`
         )
         .catch((err) => {
           console.log('Err: ', err);

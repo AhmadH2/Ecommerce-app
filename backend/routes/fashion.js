@@ -5,11 +5,11 @@ const db = marklogic.createDatabaseClient(my.connInfo);
 const qb = marklogic.queryBuilder;
 
 // Get Products for a Master Category
-router.get('/category/:name/products', (req, res) => {
-  const name = req.params.name;
+router.get('/category/products', (req, res) => {
+  const name = req.query.name;
   const page = parseInt(req.query.page) * 10;
   db.documents
-    .query(qb.where(qb.collection(req.params.name)).slice(page-10, page))
+    .query(qb.where(qb.collection(name)).slice(page-10, page))
     .result(function (documents) {
       let ds = documents.map((rec) => {
         return {
@@ -31,10 +31,10 @@ router.get('/category/:name/products', (req, res) => {
 });
 
 // Get Products for a subCategory
-router.get('/subcat/:name/products', (req, res) => {
+router.get('/subcat/products', (req, res) => {
   const page = parseInt(req.query.page) * 10;
-  const name = req.params.name;
-  db.documents.query(qb.where(qb.collection(req.params.name)).slice(page-10, page)).result(
+  const name = req.query.name;
+  db.documents.query(qb.where(qb.collection(name)).slice(page-10, page)).result(
   function (documents) {
       let ds = documents.map((rec) => {
         return {
@@ -59,6 +59,44 @@ router.get('/subcat/:name/products', (req, res) => {
   });
 });
 
+// Get Products for an Article type
+router.get('/article/products', (req, res) => {
+  const page = parseInt(req.query.page) * 10;
+  const name = req.query.name;
+  db.documents
+    .query(
+      qb
+        .where(
+          qb.parsedFrom(
+            name,
+            qb.parseBindings(
+              // qb.value('prefix', qb.bind('prefix')),
+              qb.value('typeName', qb.bind('typeName'))
+            )// equal to typeName:name
+          )
+        )
+        .slice(page - 10, page)
+    )
+    .result(function (documents) {
+      let ds = documents.map((rec) => {
+        return {
+          id: rec.content.data.id,
+          title: rec.content.data.hasOwnProperty('productDisplayName')
+            ? rec.content.data.productDisplayName
+            : 'Unknown',
+          price: rec.content.data.hasOwnProperty('price')
+            ? rec.content.data.price / 100.0
+            : 'Unknown',
+          image: rec.content.data.styleImages.search.resolutions['180X240'],
+          masterCategory: rec.content.data.masterCategory.typeName,
+          subCategory: rec.content.data.subCategory.typeName,
+          article: rec.content.data.articleType.typeName,
+        };
+      });
+      res.json(ds);
+    });
+});
+
 // Get Product by id
 router.get('/:id', (req, res) => {
   let uri = req.params.id + '.json';
@@ -76,9 +114,14 @@ router.get('/:id', (req, res) => {
       subCategory: rec.content.data.subCategory.typeName,
       description: rec.content.data.productDescriptors.description.value,
       sizes: rec.content.data.styleOptions.map((s) => s.value),
-      images: [... new Set(Object.keys(rec.content.data.styleImages)
-        .map((key) => rec.content.data.styleImages[key].imageURL)
-        .filter((img) => !!img))],
+      images: [
+        ...new Set(
+          Object.keys(rec.content.data.styleImages)
+            .map((key) => rec.content.data.styleImages[key].imageURL)
+            .filter((img) => !!img)
+        ),
+      ],
+      crossLinks: rec.content.data.crossLinks
     });
   });
 });

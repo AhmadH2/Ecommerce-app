@@ -27,6 +27,13 @@ export const setSubCat = (categories) => {
   };
 };
 
+export const setArticleType = (categories) => {
+  return {
+    type: ActionTypes.SET_ARTICLTYPE,
+    payload: categories,
+  };
+};
+
 export const setPage = (page) => {
   return {
     type: ActionTypes.SET_PAGE,
