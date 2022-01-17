@@ -4,6 +4,6 @@ module.exports = {
     port: 8000,
     user: 'admin',
     password: 'admin',
-    database: 'ecommerce',
+    database: 'fashion',
   },
 };

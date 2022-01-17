@@ -5,10 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectedProduct,
   removeSelectedProduct,
+  setProducts, setSimilarProducts, getSimilarProducts
 } from "../redux/actions/productActions";
 import styled from 'styled-components';
 import { Add, Remove } from '@material-ui/icons';
 import Slider from "./Slider";
+import {Link} from 'react-router-dom';
+import SimilarProducts from "./SimilarProducts";
 
 
 const Filter = styled.div`
@@ -64,17 +67,21 @@ const ProductDetails = () => {
   let product = useSelector((state) => state.product);
   const { images, title, price, masterCategory, subCategory, brandName, description, sizes, crossLinks } = product;
   const dispatch = useDispatch();
-  const fetchProductDetail = async (id) => {
+
+  const getProductDetail = async (id) => {
     const response = await axios
       .get(`${url}/${id}`)
       .catch((err) => {
         console.log('Err: ', err);
       });
-    dispatch(selectedProduct(response.data));
+    await dispatch(selectedProduct(response.data));
   };
 
   useEffect(() => {
-    if (productId && productId !== "") fetchProductDetail(productId);
+    if (productId && productId !== "") {
+      getProductDetail(productId);
+    } 
+
     return () => {
       dispatch(removeSelectedProduct());
     };
@@ -139,7 +146,16 @@ const ProductDetails = () => {
                 <ul>
                   {crossLinks.map((link) => (
                     <li>
-                      <a href={'http://localhost:9000/search/'+link.value}>{link.key}</a>
+                      <Link>
+                        <a
+                          onClick={() =>
+                            dispatch(getSimilarProducts([link]))
+                          }
+                        >
+                          {link.key}
+                        </a>
+                      </Link>
+
                       <br />
                     </li>
                   ))}
@@ -147,8 +163,10 @@ const ProductDetails = () => {
               </div>
             </div>
           </div>
+          
         </div>
       )}
+      { (crossLinks) && <SimilarProducts urls={crossLinks} />}
     </div>
   );
 };

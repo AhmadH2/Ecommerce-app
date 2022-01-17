@@ -43,8 +43,11 @@ router.get('/articles', (req, res) => {
     .result(
       function (results) {
         // res.send(results[0].facets.typeName.facetValues);
+        const s = results['values-response'].tuple
+          .map((obj) => obj['distinct-value'][0])
+          .filter((n) => n !== name);
         res.send(
-          results['values-response'].tuple.map((obj) => obj['distinct-value'][0])
+         s
         );
       },
       function (error) {
@@ -76,29 +79,34 @@ router.get('/articles/:name', (req, res) => {
 });
 
 // Get all subCategories list
+// router.get('/subcats', (req, res) => {
+//   db.documents
+//     .query(
+//       qb
+//         .where(qb.collection('fashion'))
+//         .calculate(qb.facet('subCatName'))
+//         .withOptions({ categories: 'none' })
+//     )
+//     .result(
+//       function (results) {
+//         res.send(results[0].facets.subCatName.facetValues);
+//         // res.send(results)
+//       },
+//       function (error) {
+//         res.send(error);
+//       }
+//     );
+// });
+
+// Returns list of subCategories of a masterCategory
 router.get('/subcats', (req, res) => {
+  const category = req.query.category;
   db.documents
     .query(
       qb
-        .where(qb.collection('fashion'))
-        .calculate(qb.facet('subCatName'))
-        .withOptions({ categories: 'none' })
+        .where(qb.and(qb.collection('category'), qb.term(category)))
+        .slice(0, 20)
     )
-    .result(
-      function (results) {
-        res.send(results[0].facets.subCatName.facetValues);
-        // res.send(results)
-      },
-      function (error) {
-        res.send(error);
-      }
-    );
-});
-
-// Returns list of subCategories of a masterCategory
-router.get('/:master/subcats', (req, res) => {
-  db.documents
-    .query(qb.where(qb.and(qb.collection('category'), qb.term(req.params.master))).slice(0,20))
     .result(
       function (results) {
         res.send(results.map((res) => res.content.subCatName));

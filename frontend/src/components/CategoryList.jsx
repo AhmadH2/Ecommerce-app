@@ -4,10 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { mobile } from '../responsive';
 // import CategoryItem from './CategoryItem';
 import axios from 'axios';
-import { setCategories, setProducts, setSubCat, setPage, setActiveCat, setArticleType } from '../redux/actions/productActions';
+import { setCategories, setProducts, setSubCat, setPage, setActiveCat, setArticleType, setBrands, setLastQuery, getProducts, getProductsForCat, searchProducts } from '../redux/actions/productActions';
 import { Button, colors } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { syncSetProducts } from '../redux/actions/asyncActionsCreater';
+import { getBrands, getColours, getGenders, getSeasons } from '../redux/actions/filtersActions';
+import { getArticleTypes, getCategories, getSubCats } from '../redux/actions/categoryActions';
 
 const Container = styled.div`
   display: flex;
@@ -23,77 +25,52 @@ const CategoryList = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categoriesReducer.categories);
   const subCat = useSelector((state) => state.categoriesReducer.subCat);
-  const page = useSelector((state)=> state.categoriesReducer.page);
-  const activeCat = useSelector((state)=> state.categoriesReducer.activeCat);
+  const activeCat = useSelector((state)=> state.pageReducer.activeCat);
   const articleTypes = useSelector(
     (state) => state.categoriesReducer.articleTypes
   );
+  const brands = useSelector((state)=> state.filtersReducer.brands);
+  const genders = useSelector((state) => state.filtersReducer.genders);
+  const colours = useSelector((state) => state.filtersReducer.colours);
+  const seasons = useSelector((state) => state.filtersReducer.seasons);
 
-  const getCategories = async () => {
-    const response = await axios.get(url + '/category').catch((err) => {
-      console.log('Err: ', err);
-    });
-    dispatch(setCategories(response.data));
-  };
+  const [filters, setFilters] = useState({});
+  const [activeName, setActiveName] = useState('');
 
-  const getSubCat = async (masterCat) => {
-    const response = await axios.get(`${url}/category/${masterCat}/subcats`)
-      .catch((err) => {
-        console.log('Err: ', err);
-      });
-      dispatch(setSubCat(response.data))
-  };
-
-  const getArticleType = async (subName) => {
-    const response = await axios
-      .get(url + `/category/articles?name=${subName}`)
-      .catch((err) => {
-        console.log('Err: ', err);
-      });
-    dispatch(setArticleType(response.data));
-  };
-
-  const getProductsforCat = async (catName) => {
-    dispatch(setProducts([]));
-    dispatch(setPage(1));
-    const response = await axios
-      .get(`${url}/fashion/category/products?name=${catName}&page=${1}`)
-      .catch((err) => {
-        console.log('Err: ', err);
-      });
-    const myUrl = `${url}/fashion/category/${catName}/products?page=${1}`;
-    dispatch(setProducts(response.data));
-  };
-
-  const getProductsforSubCat = async (subCatName) => {
-    dispatch(setProducts([]));
-    dispatch(setPage(1));
-    const response = await axios
-      .get(`${url}/fashion/subcat/products?name=${subCatName}&page=${1}`)
-      .catch((err) => console.log(err));
-    dispatch(setProducts(response.data));
+  const getFilters = (category) => {
+    const name = category.split(' ').join('-');
+    dispatch(getColours(name));
+    dispatch(getBrands(name));
+    dispatch(getGenders(name));
+    dispatch(getSeasons(name));
   }
 
-  const getProductsforArticleType = async (typeName) => {
-    dispatch(setProducts([]));
-    dispatch(setPage(1));
-    const name = typeName.split(' ').join('-');
-    const response = await axios
-      .get(`${url}/fashion/article/products?page=${1}&name=${name}`)
-      .catch((err) => console.log(err));
-    dispatch(setProducts(response.data));
-  };
-
   useEffect(() => {
-    getCategories();
+    dispatch(getCategories())
   }, []);
 
   const handleActive = (key, value) => {
+    setActiveName(value);
     if (key === 'master') {
-      dispatch(setActiveCat({master: value, sub:''}))
-    } else
-    dispatch(setActiveCat({...activeCat, [key]:value}));
+      dispatch(setActiveCat({master: value, sub:'', type: ''}))
+    }
+    else if (key === 'sub') {
+      dispatch(setActiveCat({...activeCat, sub:value, type:''}))
+    }
+    else
+    dispatch(setActiveCat({...activeCat, type:value}));
   };
+
+  const handleFilters = (filter, value) => {
+    setFilters({...filters, [filter]:value})
+  }
+
+  const applyFilters = () => {
+    let query = Object.keys(filters).map(k => `${k}:${filters[k]}::`).join('');
+    query = activeName + '::' + query.substring(0, query.length-2);
+    console.log(query);
+    dispatch(searchProducts(query,1));
+  }
 
   return (
     <div>
@@ -104,41 +81,45 @@ const CategoryList = () => {
               <Button
                 onClick={() => {
                   handleActive('master', item);
-                  getSubCat(item);
-                  getProductsforCat(item);
+                  dispatch(getSubCats(item));
+                  dispatch(setArticleType([]));
+                  getFilters(item);
+                  localStorage.setItem('page', 1);
+                  dispatch(getProductsForCat(item.split(' ').join('-'), 1));
+                  dispatch(setArticleType([]));
                 }}
                 color='secondary'
               >
-                <Link key={item} to={'/'}>
-                  {item}
-                </Link>
+                {item}
               </Button>
             ) : (
               <Button
                 onClick={() => {
                   handleActive('master', item);
-                  getSubCat(item);
-                  getProductsforCat(item);
+                  dispatch(getSubCats(item));
+                  dispatch(setArticleType([]));
+                  getFilters(item);
+                  localStorage.setItem('page', 1);
+                  dispatch(getProductsForCat(item.split(' ').join('-'), 1));
                 }}
               >
-                <Link key={item} to={'/'}>
-                  {item}
-                </Link>
+                {item}
               </Button>
             )}
           </Link>
         ))}
       </Container>
-
       <Container>
         {subCat.map((item) => (
           <Link key={item} to={'/'}>
             {item === activeCat.sub ? (
               <Button
                 onClick={() => {
-                  getProductsforSubCat(item);
+                  localStorage.setItem('page', 1);
+                  dispatch(getProductsForCat(item, 1));
                   handleActive('sub', item);
-                  getArticleType(item);
+                  dispatch(getArticleTypes(item));
+                  getFilters(item);
                 }}
                 color='secondary'
               >
@@ -147,9 +128,11 @@ const CategoryList = () => {
             ) : (
               <Button
                 onClick={() => {
-                  getProductsforSubCat(item);
+                  dispatch(getProductsForCat(item, 1));
+                  localStorage.setItem('page', 1);
                   handleActive('sub', item);
-                  getArticleType(item);
+                  dispatch(getArticleTypes(item));
+                  getFilters(item);
                 }}
               >
                 {item}
@@ -158,33 +141,93 @@ const CategoryList = () => {
           </Link>
         ))}
       </Container>
-
       <Container>
-        {articleTypes.map((item) => (
-          <Link key={item} to={'/'}>
-            {item === activeCat.sub ? (
-              <Button
-                onClick={() => {
-                  handleActive('sub', item);
-                  getProductsforArticleType(item);
-                }}
-                color='secondary'
-              >
-                {item}
-              </Button>
-            ) : (
-              <Button
-                onClick={() => {
-                  handleActive('sub', item);
-                  getProductsforArticleType(item);
-                }}
-              >
-                {item}
-              </Button>
-            )}
-          </Link>
-        ))}
+        {articleTypes
+          .filter((n) => n !== activeCat.master)
+          .map((item) => (
+            <Link key={item} to={'/'}>
+              {item === activeCat.type ? (
+                <Button
+                  onClick={() => {
+                    handleActive('type', item);
+                    localStorage.setItem('page', 1);
+                    dispatch(getProductsForCat(item, 1));
+                    getFilters(item);
+                  }}
+                  color='secondary'
+                >
+                  {item}
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    handleActive('type', item);
+                    localStorage.setItem('page', 1);
+                    dispatch(getProductsForCat(item, 1));
+                    getFilters(item);
+                  }}
+                >
+                  {item}
+                </Button>
+              )}
+            </Link>
+          ))}
       </Container>
+      Brand
+      <select onChange={(e) => handleFilters('brand', e.target.value)}>
+        <option disabled selected value>
+          {' '}
+          -- select an option --{' '}
+        </option>
+        {brands &&
+          brands.map((bnd) => (
+            <option key={bnd} value={bnd}>
+              {bnd}
+            </option>
+          ))}
+      </select>
+      Colour
+      <select onChange={(e) => handleFilters('colour', e.target.value)}>
+        <option disabled selected value>
+          {' '}
+          -- select an option --{' '}
+        </option>
+        {colours &&
+          colours.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+      </select>
+      Gender
+      <select onChange={(e) => handleFilters('gender', e.target.value)}>
+        <option disabled selected value>
+          {' '}
+          -- select an option --{' '}
+        </option>
+        {genders &&
+          genders.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
+      </select>
+      Season
+      <select onChange={(e) => handleFilters('season', e.target.value)}>
+        <option disabled selected value>
+          {' '}
+          -- select an option --{' '}
+        </option>
+        {seasons &&
+          seasons.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+      </select>
+      <Button onClick={applyFilters} color='primary'>
+        Apply Filters
+      </Button>
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { mobile } from "../responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { setProducts } from "../redux/actions/productActions";
+import { searchProducts, setLastQuery, setPage, setProducts } from "../redux/actions/productActions";
 
 const Container = styled.div`
   height: 60px;
@@ -78,14 +78,20 @@ const Header = () => {
   const dispach = useDispatch();
   const url = useSelector((state) => state.productsReducer.url);
   const [searchValue, setSearchValue] = useState('');
+  // const page = useSelector((state)=> state.productsReducer.page);
 
   const inputHandle = (event) => {
     setSearchValue(event.target.value);
   }
-  const search = () => {
-    console.log(searchValue)
-    axios.get(`${url}/search?q=${searchValue}`).then((response) => dispach(setProducts(response.data)))
-  }
+  const search = async () => {
+    console.log(searchValue);
+    // await axios
+    //   .get(`${url}/search?q=${searchValue}&page=${page}`)
+    //   .then((response) => dispach(setProducts(response.data)));
+    // dispach(setLastQuery(`${url}/search?q=${searchValue}`));
+    const page = localStorage.getItem('page');
+    dispach(searchProducts(searchValue, page));
+  };
 
   const quantity = 0;
   return (
