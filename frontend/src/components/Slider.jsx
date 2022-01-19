@@ -81,6 +81,7 @@ const Button = styled.button`
 
 const Slider = (props) => {
   const [index, setIndex] = useState(0);
+  
   const handleClick = (direction) => {
     if (direction === 'left') {
       setIndex(index !== 0 ? index - 1: props.images.length-1);

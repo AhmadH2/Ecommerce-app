@@ -6,7 +6,6 @@ export function syncSetProducts (url) {
   return  function (dispatch) {
     return fetch(url).then((response) => {
       if (response.ok) {
-        console.log(response.data)
         dispatch(setProducts(response.data));
       }
     });

@@ -33,15 +33,75 @@ router.get('/products', (req, res) => {
           price: rec.content.data.hasOwnProperty('price')
             ? rec.content.data.price / 100.0
             : 'Unknown',
+          discountedPrice: rec.content.data.discountedPrice / 100.0,
           image: rec.content.data.styleImages.search.resolutions['180X240'],
           masterCategory: rec.content.data.masterCategory.typeName,
           subCategory: rec.content.data.subCategory.typeName,
           article: rec.content.data.articleType.typeName,
+          // discountPercent: rec.content.data.discountData.discountPercent,
+          discountText: rec.content.data.hasOwnProperty('discountData')
+            ? rec.content.data.discountData.discountText.text
+            : 'Unknown',
         };
       });
       res.json(ds);
     });
   
+});
+
+router.get('/discount', (req, res) => {
+  const page = parseInt(req.query.page) * 10;
+  // const discount = parseInt(req.query.discount);
+  // const category = req.query.cat;
+  const query = req.query.q;
+  
+  db.documents
+    .query(
+      qb
+        // .where(
+        //   qb.and(
+        //     qb.range('discountPercent', '>=', discount),
+        //     qb.value('typeName', category)
+        //   )
+        // )
+        .where(
+          qb.parsedFrom(
+            query,
+            qb.parseBindings(
+              qb.range(
+                'discountPercent',
+                qb.datatype('int'), 
+                qb.bind('discount')
+              ),
+              qb.value('brandName', qb.bind('brand')),
+              qb.value('gender', qb.bind('gender')),
+              qb.value('baseColour', qb.bind('colour')),
+              qb.value('typeName', qb.bindDefault())
+            )
+          )
+        )
+        .slice(page - 10, page)
+    )
+    .result(function (documents) {
+      let ds = documents.map((rec) => {
+        return {
+          id: rec.content.data.id,
+          title: rec.content.data.hasOwnProperty('productDisplayName')
+            ? rec.content.data.productDisplayName
+            : 'Unknown',
+          price: rec.content.data.hasOwnProperty('price')
+            ? rec.content.data.price / 100.0
+            : 'Unknown',
+          discountedPrice: rec.content.data.discountedPrice / 100.0,
+          image: rec.content.data.styleImages.search.resolutions['180X240'],
+          masterCategory: rec.content.data.masterCategory.typeName,
+          subCategory: rec.content.data.subCategory.typeName,
+          article: rec.content.data.articleType.typeName,
+          discount: rec.content.data.discountData.discountPercent,
+        };
+      });
+      res.json(ds);
+    });
 });
 
 // Get Product by id
@@ -53,6 +113,7 @@ router.get('/:id', (req, res) => {
       id: rec.content.data.id,
       title: rec.content.data.productDisplayName,
       price: rec.content.data.price / 100.0,
+      discountedPrice: rec.content.data.discountedPrice / 100.0,
       brandName: rec.content.data.brandName,
       ageGroup: rec.content.data.ageGroup,
       baseColour: rec.content.data.baseColour,
@@ -69,6 +130,9 @@ router.get('/:id', (req, res) => {
         ),
       ],
       crossLinks: rec.content.data.crossLinks,
+      discountText: rec.content.data.hasOwnProperty('discountData')
+        ? rec.content.data.discountData.discountToolTipText.text
+        : 'Unknown',
     });
   });
 });
@@ -82,11 +146,21 @@ router.get('/', (req, res) => {
       let ds = records.map((rec) => {
         return {
           id: rec.content.data.id,
-          title: rec.content.data.productDisplayName,
-          price: rec.content.data.price / 100.0,
-          image: rec.content.data.styleImages.default.resolutions['150X200'],
+          title: rec.content.data.hasOwnProperty('productDisplayName')
+            ? rec.content.data.productDisplayName
+            : 'Unknown',
+          price: rec.content.data.hasOwnProperty('price')
+            ? rec.content.data.price / 100.0
+            : 'Unknown',
+          discountedPrice: rec.content.data.discountedPrice / 100.0,
+          image: rec.content.data.styleImages.search.resolutions['180X240'],
           masterCategory: rec.content.data.masterCategory.typeName,
           subCategory: rec.content.data.subCategory.typeName,
+          article: rec.content.data.articleType.typeName,
+          // discountPercent: rec.content.data.discountData.discountPercent,
+          discountText: rec.content.data.hasOwnProperty('discountData')
+            ? rec.content.data.discountData.discountText.text
+            : 'Unknown',
         };
       });
       res.json(ds);

@@ -48,3 +48,21 @@ export const getSeasons = (category) => {
     });
   };
 };
+
+export const getOffers = (query='off:off') => {
+  return async (dispatch) => {
+    dispatch({ type: ActionTypes.GET_PRODUCTS_STARTED });
+    localStorage.setItem(
+      'lastQuery',
+      `http://localhost:9000/filter/discount?q=${query}`
+    );
+    const response = await axios
+      .get(`http://localhost:9000/filter/discount?q=${query}&page=1`)
+      .catch((err) => console.log(err));
+
+    dispatch({
+      type: ActionTypes.GET_PRODUCTS_SUCCEEDED,
+      payload: response.data,
+    });
+  };
+};

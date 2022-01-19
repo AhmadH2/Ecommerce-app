@@ -35,7 +35,6 @@ const CategoryList = () => {
   const seasons = useSelector((state) => state.filtersReducer.seasons);
 
   const [filters, setFilters] = useState({});
-  const [activeName, setActiveName] = useState('');
 
   const getFilters = (category) => {
     const name = category.split(' ').join('-');
@@ -50,7 +49,7 @@ const CategoryList = () => {
   }, []);
 
   const handleActive = (key, value) => {
-    setActiveName(value);
+    localStorage.setItem('activeCat', value);
     if (key === 'master') {
       dispatch(setActiveCat({master: value, sub:'', type: ''}))
     }
@@ -62,13 +61,24 @@ const CategoryList = () => {
   };
 
   const handleFilters = (filter, value) => {
+    if (value === 'none') {
+      let newFilter = {}
+      Object.keys(filters)
+        .filter((key) => key !== filter)
+        .map((k) => (newFilter[k] = filters[k]));
+      setFilters(newFilter); 
+    }
+    else
     setFilters({...filters, [filter]:value})
+    
   }
 
   const applyFilters = () => {
     let query = Object.keys(filters).map(k => `${k}:${filters[k]}::`).join('');
-    query = activeName + '::' + query.substring(0, query.length-2);
-    console.log(query);
+    query =
+      localStorage.getItem('activeCat') +
+      '::' +
+      query.substring(0, query.length - 2);
     dispatch(searchProducts(query,1));
   }
 
@@ -76,7 +86,7 @@ const CategoryList = () => {
     <div>
       <Container>
         {categories.map((item) => (
-          <Link key={item} to={'/'}>
+          <Link key={item} to={'/products'}>
             {item === activeCat.master ? (
               <Button
                 onClick={() => {
@@ -111,7 +121,7 @@ const CategoryList = () => {
       </Container>
       <Container>
         {subCat.map((item) => (
-          <Link key={item} to={'/'}>
+          <Link key={item} to={'/products'}>
             {item === activeCat.sub ? (
               <Button
                 onClick={() => {
@@ -141,11 +151,11 @@ const CategoryList = () => {
           </Link>
         ))}
       </Container>
-      <Container>
+      {brands.length >0 ? (<><Container>
         {articleTypes
           .filter((n) => n !== activeCat.master)
           .map((item) => (
-            <Link key={item} to={'/'}>
+            <Link key={item} to={'/products'}>
               {item === activeCat.type ? (
                 <Button
                   onClick={() => {
@@ -173,61 +183,60 @@ const CategoryList = () => {
             </Link>
           ))}
       </Container>
-      Brand
-      <select onChange={(e) => handleFilters('brand', e.target.value)}>
-        <option disabled selected value>
-          {' '}
-          -- select an option --{' '}
-        </option>
-        {brands &&
-          brands.map((bnd) => (
-            <option key={bnd} value={bnd}>
-              {bnd}
-            </option>
-          ))}
-      </select>
-      Colour
-      <select onChange={(e) => handleFilters('colour', e.target.value)}>
-        <option disabled selected value>
-          {' '}
-          -- select an option --{' '}
-        </option>
-        {colours &&
-          colours.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-      </select>
-      Gender
-      <select onChange={(e) => handleFilters('gender', e.target.value)}>
-        <option disabled selected value>
-          {' '}
-          -- select an option --{' '}
-        </option>
-        {genders &&
-          genders.map((g) => (
-            <option key={g} value={g}>
-              {g}
-            </option>
-          ))}
-      </select>
-      Season
-      <select onChange={(e) => handleFilters('season', e.target.value)}>
-        <option disabled selected value>
-          {' '}
-          -- select an option --{' '}
-        </option>
-        {seasons &&
-          seasons.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-      </select>
-      <Button onClick={applyFilters} color='primary'>
-        Apply Filters
-      </Button>
+      <Container>
+        Brand
+        <select onChange={(e) => handleFilters('brand', e.target.value)}>
+          <option defaultValue value={'none'}>
+            None
+          </option>
+          {brands &&
+            brands.map((bnd) => (
+              <option key={bnd} value={bnd}>
+                {bnd}
+              </option>
+            ))}
+        </select>
+        Colour
+        <select onChange={(e) => handleFilters('colour', e.target.value)}>
+          <option defaultValue value={'none'}>
+            None
+          </option>
+          {colours &&
+            colours.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+        </select>
+        Gender
+        <select onChange={(e) => handleFilters('gender', e.target.value)}>
+          <option defaultValue value={'none'}>
+            None
+          </option>
+          {genders &&
+            genders.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
+            ))}
+        </select>
+        Season
+        <select onChange={(e) => handleFilters('season', e.target.value)}>
+          <option defaultValue value={'none'}>
+            None
+          </option>
+          {seasons &&
+            seasons.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+        </select>
+        <Button onClick={applyFilters} color='primary'>
+          Apply Filters
+        </Button>
+      </Container></>) : <></>}
+      
     </div>
   );
 }

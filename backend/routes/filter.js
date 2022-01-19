@@ -116,5 +116,56 @@ router.get('/season', (req, res) => {
     );
 });
 
+router.get('/discount', (req, res) => {
+  const query = req.query.q;
+  const page = parseInt(req.query.page) * 20;
+
+  db.documents
+    .query(
+      qb
+        .where(
+          // qb.word('text', 'off')
+          qb.parsedFrom(
+            query,
+            qb.parseBindings(
+              qb.word('text', qb.bind('off')),
+              // qb.value('gender', qb.bind('gender')),
+              // qb.value('baseColour', qb.bind('colour')),
+              // qb.value('season', qb.bind('season')),
+              qb.word('typeName', qb.bind('cat'))
+            )
+          )
+        )
+        .slice(page - 20, page)
+    )
+    .result(
+      function (documents) {
+        const data = documents.map((rec) => {
+          return {
+            id: rec.content.data.id,
+            title: rec.content.data.hasOwnProperty('productDisplayName')
+              ? rec.content.data.productDisplayName
+              : 'Unknown',
+            price: rec.content.data.hasOwnProperty('price')
+              ? rec.content.data.price / 100.0
+              : 'Unknown',
+            discountedPrice: rec.content.data.discountedPrice / 100.0,
+            image: rec.content.data.styleImages.search.resolutions['180X240'],
+            masterCategory: rec.content.data.masterCategory.typeName,
+            subCategory: rec.content.data.subCategory.typeName,
+            article: rec.content.data.articleType.typeName,
+            // discountPercent: rec.content.data.discountData.discountPercent,
+            discountText: rec.content.data.hasOwnProperty('discountData')
+              ? rec.content.data.discountData.discountText.text
+              : 'Unknown',
+          };
+        });
+        res.json(data);
+      },
+      function (error) {
+        res.send(error);
+      }
+    );
+});
 
 module.exports = router;

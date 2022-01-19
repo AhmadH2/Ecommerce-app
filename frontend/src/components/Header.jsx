@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { searchProducts, setLastQuery, setPage, setProducts } from "../redux/actions/productActions";
+import { getColours, getBrands, getGenders, getSeasons, getOffers } from "../redux/actions/filtersActions";
+import { useHistory } from 'react-router-dom';
 
 const Container = styled.div`
   height: 60px;
@@ -38,9 +40,33 @@ const Language = styled.span`
 const SearchContainer = styled.div`
   border: 0.5px solid lightgray;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  position: absolute;
+  left: 20vw;
+  top: 1vw;
+  // align-items: center;
   margin-left: 25px;
+  // margin: 10px;
+`;
+
+const SearchInput = styled.div`
+  border: 0.5px solid lightgray;
+  display: flex;
+  align-items: center;
+  // margin-left: 25px;
   padding: 5px;
+`;
+
+const SearchSuggestions = styled.div`
+  border: 0.5px solid lightgray;
+  display: flex;
+  position: obsolute;
+  flex-direction: column;
+  width: 100%
+  align-items: center;
+  // margin-left: 25px;
+  padding: 5px;
+  z-index: 1;
 `;
 
 const Input = styled.input`
@@ -75,22 +101,38 @@ const MenuItem = styled.div`
 
 const Header = () => {
   // const quantity = useSelector(state=>state.cart.quantity)
-  const dispach = useDispatch();
+  const dispatch = useDispatch();
   const url = useSelector((state) => state.productsReducer.url);
   const [searchValue, setSearchValue] = useState('');
   // const page = useSelector((state)=> state.productsReducer.page);
-
+  const [suggestios, setSuggestions] = useState([]);
+  const history = useHistory();
+  const getSuggestions = (term) => {
+    axios.get(`http://localhost:9000/search/suggest/${term}`).then((res)=> setSuggestions(res.data))
+  }
   const inputHandle = (event) => {
     setSearchValue(event.target.value);
+    getSuggestions(event.target.value);
   }
-  const search = async () => {
-    console.log(searchValue);
-    // await axios
-    //   .get(`${url}/search?q=${searchValue}&page=${page}`)
-    //   .then((response) => dispach(setProducts(response.data)));
-    // dispach(setLastQuery(`${url}/search?q=${searchValue}`));
+
+    const getFilters = (category) => {
+      const name = category.split(' ').join('-');
+      dispatch(getColours(name));
+      dispatch(getBrands(name));
+      dispatch(getGenders(name));
+      dispatch(getSeasons(name));
+    };
+    
+  const search = async (term=searchValue) => {
+    // setSearchValue('');
+
+    localStorage.setItem('activeCat', term);
+    setSuggestions([])
     const page = localStorage.getItem('page');
-    dispach(searchProducts(searchValue, page));
+    dispatch(searchProducts(term, page));
+    getFilters(term);
+    history.push('/products');
+    
   };
 
   const quantity = 0;
@@ -98,18 +140,52 @@ const Header = () => {
     <Container>
       <Wrapper>
         <Left>
-          <Logo>Horyzat shop</Logo>
+          <Link to={'/'}>
+            <Logo>Horyzat shop</Logo>
+          </Link>
           {/* <Language>EN</Language> */}
           <SearchContainer>
-            <Input placeholder='Search' onChange={inputHandle} />
-            <Search style={{ color: 'gray', fontSize: 16 }} />
-            <Button color='primary' onClick={search} type="submit">
-              Search
-            </Button>
+            <SearchInput>
+              <Input
+                placeholder='Search'
+                onChange={inputHandle}
+                value={searchValue}
+              />
+              <Search style={{ color: 'gray', fontSize: 16 }} />
+              <Button color='primary' onClick={() => search()} type='submit'>
+                Search
+              </Button>
+            </SearchInput>
+
+            <SearchSuggestions>
+              {suggestios.length > 0 ? (
+                suggestios.map((s) => (
+                  <Link
+                    style={{ backgroundColor: 'whitesmoke' }}
+                    onClick={() => {
+                      search(s);
+                      setSearchValue(s);
+                      setSuggestions([]);
+                    }}
+                  >
+                    <Button>{s}</Button>
+                    {/* <hr /> */}
+                  </Link>
+                ))
+              ) : (
+                <span></span>
+              )}
+            </SearchSuggestions>
           </SearchContainer>
         </Left>
         <Center>{/* <Logo>LAMA.</Logo> */}</Center>
         <Right>
+          <Link to={'/products'}>
+            <MenuItem>Categories</MenuItem>
+          </Link>
+          <Link to={'/offers'}>
+            <MenuItem>Hot-Offers</MenuItem>
+          </Link>
           <MenuItem>REGISTER</MenuItem>
           <MenuItem>SIGN IN</MenuItem>
           <Link to='/cart'>

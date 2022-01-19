@@ -5,14 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectedProduct,
   removeSelectedProduct,
-  setProducts, setSimilarProducts, getSimilarProducts
+  setProducts, setSimilarProducts, getSimilarProducts, getProducts, searchProducts
 } from "../redux/actions/productActions";
 import styled from 'styled-components';
 import { Add, Remove } from '@material-ui/icons';
 import Slider from "./Slider";
 import {Link} from 'react-router-dom';
 import SimilarProducts from "./SimilarProducts";
-
 
 const Filter = styled.div`
   display: flex;
@@ -56,6 +55,7 @@ const Amount = styled.span`
 `;
 
 
+
 const FilterSizeOption = styled.option``;
 
 const url = 'http://localhost:9000/fashion';
@@ -65,7 +65,19 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const { productId } = useParams();
   let product = useSelector((state) => state.product);
-  const { images, title, price, masterCategory, subCategory, brandName, description, sizes, crossLinks } = product;
+  const {
+    images,
+    title,
+    price,
+    discountedPrice,
+    masterCategory,
+    subCategory,
+    brandName,
+    description,
+    sizes,
+    crossLinks,
+    discountText,
+  } = product;
   const dispatch = useDispatch();
 
   const getProductDetail = async (id) => {
@@ -75,6 +87,7 @@ const ProductDetails = () => {
         console.log('Err: ', err);
       });
     await dispatch(selectedProduct(response.data));
+    console.log(response.data)
   };
 
   useEffect(() => {
@@ -110,7 +123,20 @@ const ProductDetails = () => {
               <div className='column rp'>
                 <h1>{title}</h1>
                 <h2>
-                  <span className='ui teal tag label'>$ {price}</span>
+                  <span className='ui teal tag label'>
+                    $ {discountedPrice},
+                    <span className='strikethrough' style={{ marginLeft: 10 }}>
+                      <span style={{ color: 'white' }}>$ {price}</span>
+                    </span>
+                  </span>
+                  <div
+                    dangerouslySetInnerHTML={{ __html: discountText }}
+                    style={{
+                      marginTop: 10,
+                      color: '#383838',
+                      fontWeight: 'initial',
+                    }}
+                  ></div>
                 </h2>
                 <h4 className='ui brown block header'>
                   Categories: {masterCategory}, {subCategory}
@@ -145,15 +171,21 @@ const ProductDetails = () => {
                 <h4>Cheak this links for simialer products:</h4>
                 <ul>
                   {crossLinks.map((link) => (
-                    <li>
-                      <Link>
-                        <a
-                          onClick={() =>
-                            dispatch(getSimilarProducts([link]))
-                          }
-                        >
-                          {link.key}
-                        </a>
+                    <li key={link.key}>
+                      <Link
+                        to={'/products'}
+                        onClick={() => {
+                          let q = link.value.replace('men women', 'unisex');
+                          q = q.replace('?f=', '::');
+                          localStorage.setItem('page', 1);
+                          localStorage.setItem(
+                            'lastQuery',
+                            `http://localhost:9000/search?q=shoes`
+                          );
+                          dispatch(searchProducts(q, 1));
+                        }}
+                      >
+                        {link.key}
                       </Link>
 
                       <br />
@@ -163,10 +195,9 @@ const ProductDetails = () => {
               </div>
             </div>
           </div>
-          
         </div>
       )}
-      { (crossLinks) && <SimilarProducts urls={crossLinks} />}
+      {crossLinks && <SimilarProducts urls={crossLinks} />}
     </div>
   );
 };

@@ -7,6 +7,7 @@ import {
   removeSelectedProduct,
   setProducts, setSimilarProducts, getSimilarProducts
 } from "../redux/actions/productActions";
+import ProductItem from './ProductItem';
 
 const SimilarProducts = (props) => {
 
@@ -27,19 +28,8 @@ const SimilarProducts = (props) => {
     const { id, title, image, price, masterCategory, subCategory } = product;
     return (
       <div className='four wide column' key={product.id}>
-        <Link to={`/product/${id}`}>
-          <div className='ui link cards'>
-            <div className='card'>
-              <div className='image'>
-                <img src={image} alt={title} />
-              </div>
-              <div className='content'>
-                <div className='header'>{title}</div>
-                <div className='meta price'>$ {price}</div>
-                <div className='meta'>{masterCategory}, {subCategory}</div>
-              </div>
-            </div>
-          </div>
+        <Link to={`/product/${product.id}`}>
+          <ProductItem product={product} />
         </Link>
       </div>
     );

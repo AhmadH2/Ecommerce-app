@@ -14,7 +14,8 @@ const initialState = {
   colours: [],
   seasons: [],
   isLoading: false,
-  error: null
+  error: null,
+  hotProductsLists: []
 };
 
 export const productsReducer = (state = initialState, { type, payload }) => {
@@ -46,7 +47,6 @@ export const categoriesReducer = (state = initialState, { type, payload }) => {
 };
 
 export const selectedProductsReducer = (state = {}, { type, payload }) => {
-  console.log(type);
   switch (type) {
     case ActionTypes.SELECTED_PRODUCT:
       return { ...state, ...payload };

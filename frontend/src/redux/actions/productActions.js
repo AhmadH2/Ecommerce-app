@@ -2,6 +2,12 @@ import { ActionTypes } from "../constants/action-types";
 import axios from 'axios';
 import {useSelector} from 'react-redux'
 
+export const getProductsStarted = () => {
+  return {
+    type: ActionTypes.GET_PRODUCTS_STARTED
+  }
+}
+
 export const getProducts = (page=1) => {
   return async (dispatch) => {
     dispatch({type: ActionTypes.GET_PRODUCTS_STARTED});
@@ -18,7 +24,6 @@ export const getProducts = (page=1) => {
 
 export const getProductsForCat = (category, page) => {
   const name = category.split(' ').join('-');
-  console.log('category: ', name);
   return async (dispatch) => {
     dispatch({ type: ActionTypes.GET_PRODUCTS_STARTED });
     localStorage.setItem('lastQuery', `http://localhost:9000/fashion/products?category=${name}`);
@@ -58,13 +63,14 @@ export const getSimilarProducts = (urls) => {
 
 export const searchProducts = (searchValue, page=1) => {
   return async (dispatch) => {
-    // dispatch({type: ActionTypes.GET_PRODUCTS_STARTED});
+    dispatch({type: ActionTypes.GET_PRODUCTS_STARTED});
     localStorage.setItem('lastQuery', `http://localhost:9000/search?q=${searchValue}`);
+    console.log("search", `http://localhost:9000/search?q=${searchValue}`);
     const response = await axios
       .get(`http://localhost:9000/search?q=${searchValue}&page=${page}`).catch(err => console.log(err));
 
     dispatch({
-      type: ActionTypes.SET_PRODUCTS,
+      type: ActionTypes.GET_PRODUCTS_SUCCEEDED,
       payload: response.data,
     });
   };

@@ -1,10 +1,13 @@
 import React, { useEffect, useCallback, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setPage, setProducts, setLastQuery, setCategories, fetchProducts, getProducts } from "../redux/actions/productActions";
-import ProductComponent from "./ProductComponent";
+import { setPage, setProducts, setLastQuery, setCategories, fetchProducts, getProducts, getProductsStarted } from "../redux/actions/productActions";
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
+import ProductItem from "./ProductItem";
+import { Link } from "react-router-dom";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 // const url = 'http://localhost:9000';
 
@@ -12,35 +15,46 @@ const ProductList = () => {
 
   const url = useSelector(state => state.productsReducer.url)
   const dispatch = useDispatch();
-  const page = useSelector((state)=> state.pageReducer.page)
-  // const lastQuery = useSelector((state) => state.pageReducer.lastQuery);
  
-  const products = useSelector(state => state.productsReducer.products)
+  const products = useSelector((state) => state.productsReducer.products);
+  const isLoading = useSelector((state) => state.productsReducer.isLoading);
 
   useEffect(() => {
-    dispatch(getProducts(3));
+    // dispatch(getProducts(3));
   }, []);
 
   const handlePage = async (event, value) => {
-    dispatch(setProducts([]))
+    dispatch(getProductsStarted())
     localStorage.setItem('page', value);
 
     const lastQuery = localStorage.getItem('lastQuery'); 
-    if(lastQuery && lastQuery !== '') {
+    // if(lastQuery && lastQuery !== '') {
       const response = await axios
         .get(`${lastQuery}&page=${value}`)
         .catch((err) => {
           console.log('Err: ', err);
         });
-      console.log(response.data);
       dispatch(setProducts(response.data));
-    }
+    // }
+    window.scrollTo(0, 0);
   }
 
   return (
     <div>
       <div className='ui grid container'>
-        <ProductComponent />
+        {isLoading ? (
+          <Box sx={{ display: 'flex'}}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          products.map((product) => (
+            <div className='four wide column' key={product.id}>
+              <Link to={`/product/${product.id}`}>
+                <ProductItem product={product} />
+              </Link>
+            </div>
+          ))
+        )}
       </div>
       <div
         className='ui grid container'
