@@ -25,9 +25,13 @@ const SimilarProducts = (props) => {
     const renderList = similarProducts.length === 0 ? 
         <div>...Loading</div>
        : similarProducts.map((product) => {
-    const { id, title, image, price, masterCategory, subCategory } = product;
+    // const { id, title, image, price, masterCategory, subCategory } = product;
     return (
-      <div className='four wide column' key={product.id}>
+      <div
+        className='four wide column'
+        key={product.id}
+        onClick={() => window.scrollTo(0, 0)}
+      >
         <Link to={`/product/${product.id}`}>
           <ProductItem product={product} />
         </Link>

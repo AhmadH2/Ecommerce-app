@@ -17,6 +17,7 @@ const Offers = () => {
   }, []);
 
   const getOffersForCat = (event) => {
+    localStorage.setItem('page', '1')
     if (event.target.value == 'all')
       dispatch(getOffers(`off:off`));
     else 
@@ -26,7 +27,7 @@ const Offers = () => {
   return (
     <>
       <Container>
-        <span>Categories</span>
+        <span style={{marginLeft:'20px', fontsize:'30px'}}>Categories{' '}</span>
         <Select onChange={getOffersForCat}>
           <option default value={'all'}>
             All

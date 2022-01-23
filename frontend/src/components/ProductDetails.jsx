@@ -12,6 +12,8 @@ import { Add, Remove } from '@material-ui/icons';
 import Slider from "./Slider";
 import {Link} from 'react-router-dom';
 import SimilarProducts from "./SimilarProducts";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const Filter = styled.div`
   display: flex;
@@ -53,8 +55,6 @@ const Amount = styled.span`
   justify-content: center;
   margin: 0px 5px;
 `;
-
-
 
 const FilterSizeOption = styled.option``;
 
@@ -111,7 +111,9 @@ const ProductDetails = () => {
   return (
     <div className='ui grid container'>
       {Object.keys(product).length === 0 ? (
-        <div>...Loading</div>
+        <Box sx={{ display: 'flex' }}>
+          <CircularProgress />
+        </Box>
       ) : (
         <div className='ui placeholder segment'>
           <div className='ui two column stackable center aligned grid'>
@@ -124,19 +126,26 @@ const ProductDetails = () => {
                 <h1>{title}</h1>
                 <h2>
                   <span className='ui teal tag label'>
-                    $ {discountedPrice},
-                    <span className='strikethrough' style={{ marginLeft: 10 }}>
-                      <span style={{ color: 'white' }}>$ {price}</span>
-                    </span>
+                    $ {discountedPrice}
+                    {price !== discountedPrice && (
+                      <span
+                        className='strikethrough'
+                        style={{ marginLeft: 10 }}
+                      >
+                        <span style={{ color: 'white' }}>$ {price}</span>
+                      </span>
+                    )}
                   </span>
-                  <div
-                    dangerouslySetInnerHTML={{ __html: discountText }}
-                    style={{
-                      marginTop: 10,
-                      color: '#383838',
-                      fontWeight: 'initial',
-                    }}
-                  ></div>
+                  {price !== discountedPrice && (
+                    <div
+                      dangerouslySetInnerHTML={{ __html: discountText }}
+                      style={{
+                        marginTop: 10,
+                        color: '#383838',
+                        fontWeight: 'initial',
+                      }}
+                    ></div>
+                  )}
                 </h2>
                 <h4 className='ui brown block header'>
                   Categories: {masterCategory}, {subCategory}
@@ -197,6 +206,9 @@ const ProductDetails = () => {
           </div>
         </div>
       )}
+      <h2 className='ui grid container' style={{ marginBottom: 10 }}>
+        Similar Products:
+      </h2>
       {crossLinks && <SimilarProducts urls={crossLinks} />}
     </div>
   );

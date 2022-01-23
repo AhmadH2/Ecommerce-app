@@ -48,7 +48,7 @@ const ProductList = () => {
           </Box>
         ) : (
           products.map((product) => (
-            <div className='four wide column' key={product.id}>
+            <div className='four wide column' key={product.id} onClick={()=> window.scrollTo(0,0)}>
               <Link to={`/product/${product.id}`}>
                 <ProductItem product={product} />
               </Link>

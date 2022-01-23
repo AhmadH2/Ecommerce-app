@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { mobile } from '../responsive';
 // import CategoryItem from './CategoryItem';
 import axios from 'axios';
-import { setCategories, setProducts, setSubCat, setPage, setActiveCat, setArticleType, setBrands, setLastQuery, getProducts, getProductsForCat, searchProducts } from '../redux/actions/productActions';
-import { Button, colors } from '@material-ui/core';
+import { setCategories, setProducts, setSubCat, setPage, setActiveCat,
+   setArticleType, setBrands, setLastQuery, getProducts, getProductsForCat, searchProducts } from '../redux/actions/productActions';
+import { Button, colors, Select } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { syncSetProducts } from '../redux/actions/asyncActionsCreater';
 import { getBrands, getColours, getGenders, getSeasons } from '../redux/actions/filtersActions';
@@ -13,10 +14,11 @@ import { getArticleTypes, getCategories, getSubCats } from '../redux/actions/cat
 
 const Container = styled.div`
   display: flex;
-  padding: 20px;
+  padding: 10px;
   // border-bottom: 2px solid palevioletred;
   justify-content: space-evenly;
-  ${mobile({ padding: '0px', flexDirection: 'column' })}`;
+  ${mobile({ padding: '0px', flexDirection: 'column' })}
+`;
 
 const url = 'http://localhost:9000';
 
@@ -151,92 +153,128 @@ const CategoryList = () => {
           </Link>
         ))}
       </Container>
-      {brands.length >0 ? (<><Container>
-        {articleTypes
-          .filter((n) => n !== activeCat.master)
-          .map((item) => (
-            <Link key={item} to={'/products'}>
-              {item === activeCat.type ? (
-                <Button
-                  onClick={() => {
-                    handleActive('type', item);
-                    localStorage.setItem('page', 1);
-                    dispatch(getProductsForCat(item, 1));
-                    getFilters(item);
-                  }}
-                  color='secondary'
-                >
-                  {item}
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => {
-                    handleActive('type', item);
-                    localStorage.setItem('page', 1);
-                    dispatch(getProductsForCat(item, 1));
-                    getFilters(item);
-                  }}
-                >
-                  {item}
-                </Button>
-              )}
-            </Link>
-          ))}
-      </Container>
-      <Container>
-        Brand
-        <select onChange={(e) => handleFilters('brand', e.target.value)}>
-          <option defaultValue value={'none'}>
-            None
-          </option>
-          {brands &&
-            brands.map((bnd) => (
-              <option key={bnd} value={bnd}>
-                {bnd}
+      {brands.length > 0 ? (
+        <>
+          {/* <Container>
+            {articleTypes
+              .filter((n) => n !== activeCat.master)
+              .map((item) => (
+                <Link key={item} to={'/products'}>
+                  {item === activeCat.type ? (
+                    <Button
+                      onClick={() => {
+                        handleActive('type', item);
+                        localStorage.setItem('page', 1);
+                        dispatch(getProductsForCat(item, 1));
+                        getFilters(item);
+                      }}
+                      color='secondary'
+                    >
+                      {item}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        handleActive('type', item);
+                        localStorage.setItem('page', 1);
+                        dispatch(getProductsForCat(item, 1));
+                        getFilters(item);
+                      }}
+                    >
+                      {item}
+                    </Button>
+                  )}
+                </Link>
+              ))}
+          </Container> */}
+          <div style={{ marginLeft: '50px' }}>
+            Brand{' '}
+            <select
+              style={{ marginRight: '20px' }}
+              onChange={(e) => handleFilters('brand', e.target.value)}
+            >
+              <option defaultValue value={'none'}>
+                None
               </option>
-            ))}
-        </select>
-        Colour
-        <select onChange={(e) => handleFilters('colour', e.target.value)}>
-          <option defaultValue value={'none'}>
-            None
-          </option>
-          {colours &&
-            colours.map((c) => (
-              <option key={c} value={c}>
-                {c}
+              {brands &&
+                brands.map((bnd) => (
+                  <option key={bnd} value={bnd}>
+                    {bnd}
+                  </option>
+                ))}
+            </select>
+            Colour{' '}
+            <select
+              style={{ marginRight: '20px' }}
+              onChange={(e) => handleFilters('colour', e.target.value)}
+            >
+              <option defaultValue value={'none'}>
+                None
               </option>
-            ))}
-        </select>
-        Gender
-        <select onChange={(e) => handleFilters('gender', e.target.value)}>
-          <option defaultValue value={'none'}>
-            None
-          </option>
-          {genders &&
-            genders.map((g) => (
-              <option key={g} value={g}>
-                {g}
+              {colours &&
+                colours.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+            </select>
+            Gender{' '}
+            <select
+              style={{ marginRight: '20px' }}
+              onChange={(e) => handleFilters('gender', e.target.value)}
+            >
+              <option defaultValue value={'none'}>
+                None
               </option>
-            ))}
-        </select>
-        Season
-        <select onChange={(e) => handleFilters('season', e.target.value)}>
-          <option defaultValue value={'none'}>
-            None
-          </option>
-          {seasons &&
-            seasons.map((s) => (
-              <option key={s} value={s}>
-                {s}
+              {genders &&
+                genders.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+            </select>
+            Season{' '}
+            <select
+              style={{ marginRight: '20px' }}
+              onChange={(e) => handleFilters('season', e.target.value)}
+            >
+              <option defaultValue value={'none'}>
+                None
               </option>
-            ))}
-        </select>
-        <Button onClick={applyFilters} color='primary'>
-          Apply Filters
-        </Button>
-      </Container></>) : <></>}
-      
+              {seasons &&
+                seasons.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+            </select>
+            <Button
+              style={{ marginRight: '20px' }}
+              onClick={applyFilters}
+              color='primary'
+            >
+              Apply Filters
+            </Button>
+            Products{' '}
+            <select
+              onChange={(event) => {
+                handleActive('type', event.target.value);
+                localStorage.setItem('page', 1);
+                dispatch(getProductsForCat(event.target.value, 1));
+                getFilters(event.target.value);
+              }}
+            >
+              {articleTypes
+                .filter((n) => n !== activeCat.master)
+                .map((item) => (
+                  <option value={item}>{item}</option>
+                ))}
+            </select>
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

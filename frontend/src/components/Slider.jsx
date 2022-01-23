@@ -92,13 +92,21 @@ const Slider = (props) => {
 
   return (
     <Container>
-      <Arrow
-        direction='left'
-        onClick={() => handleClick('left')}
-      >
+      <Arrow direction='left' onClick={() => handleClick('left')}>
         <ArrowLeftOutlined />
       </Arrow>
-      <img src={props.images[index]} />
+      <div
+        style={{
+          position: 'relative',
+          textAlign: 'center',
+          color: 'white',
+        }}
+      >
+        <img src={props.images[index]} style={{ width: '100%' }} />
+        <div
+          style={{ position: 'absolute', top: 8, right: 16, color: 'black' }}
+        >{`${index + 1}/${props.images.length}`}</div>
+      </div>
       <Arrow direction='right' onClick={() => handleClick('right')}>
         <ArrowRightOutlined />
       </Arrow>

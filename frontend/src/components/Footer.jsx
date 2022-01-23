@@ -5,7 +5,7 @@ import {
   Phone,
   Pinterest,
   Room,
-  Twitter,
+  Twitter
 } from '@material-ui/icons';
 import styled from 'styled-components';
 import { mobile } from '../responsive';
@@ -89,9 +89,10 @@ const Footer = () => {
       <Left>
         <Logo>Horyzat</Logo>
         <Desc>
-          There are many variations of passages of Lorem Ipsum available, but
-          the majority have suffered alteration in some form, by injected
-          humour, or randomised words which don’t look even slightly believable.
+          Our mission at Horyzat Shop is to make a large amount of products
+          available to customers by a click of a button, users can brows our
+          products and do shoping while they are sitting in their homes, ourder
+          products easily and the products will be delivered to their homes
         </Desc>
         <SocialContainer>
           <SocialIcon color='3B5999'>
@@ -126,14 +127,13 @@ const Footer = () => {
       <Right>
         <Title>Contact</Title>
         <ContactItem>
-          <Room style={{ marginRight: '10px' }} /> 622 Dixie Path , South
-          Tobinchester 98336
+          <Room style={{ marginRight: '10px' }} /> P787 Westbank, Palestine
         </ContactItem>
         <ContactItem>
-          <Phone style={{ marginRight: '10px' }} /> +1 234 56 78
+          <Phone style={{ marginRight: '10px' }} /> +970 580 454 37
         </ContactItem>
         <ContactItem>
-          <MailOutline style={{ marginRight: '10px' }} /> contact@ahmad.dev
+          <MailOutline style={{ marginRight: '10px' }} /> ahmadhoryzat@gmail.com
         </ContactItem>
         <Payment src='https://i.ibb.co/Qfvn4z6/payment.png' />
       </Right>

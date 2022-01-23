@@ -15,7 +15,7 @@ const productsListsInfo = [
     value: 'kurtis::gender:women::discount%20GE%2010',
   },
   {
-    key: 'Hot Offers on Formal Shoes for Men',
+    key: 'Formal Shoes for Men',
     value: 'formal-shoes::gender:men::discount%20GE%2010',
   },
   {
@@ -27,11 +27,11 @@ const productsListsInfo = [
     value: 'boxers::gender:men',
   },
   {
-    key: 'Hot Offers on Women Bags',
+    key: 'Women Bags',
     value: 'bags::gender:women::discount%20GE%2010',
   },
   {
-    key: 'Discounts on Accessories',
+    key: 'Accessories',
     value: 'accessories::gender:women::discount%20GE%2010',
   },
   {
@@ -51,7 +51,7 @@ const productsListsInfo = [
     value: 'jackets::brand:adidas::gender:men::discount%20GE%2010',
   },
   {
-    key: 'Indian Clothes for Women',
+    key: 'Indian Saree',
     value: 'saree::discount%20GE%2010',
   },
   {
